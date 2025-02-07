@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
+import { evaluate } from 'mathjs';
 
 const KawaiiCalculator = () => {
   const [input, setInput] = useState('');
   const [result, setResult] = useState(0);
 
-  // Matematiksel işlem için güvenli bir çözüm
   const calculateResult = (expression) => {
     try {
-      // Yalnızca geçerli matematiksel ifadeleri değerlendir
-      // regex ile sadece sayılar ve temel işlemler ( +, -, *, /, . ) kabul edilir
-      if (/[^0-9+\-*/.() ]/.test(expression)) {
-        throw new Error('Invalid character');
-      }
-      // Burada `Function` constructor'ı ile güvenli bir hesaplama yapıyoruz
-      const result = new Function('return ' + expression)();
-      return result;
+      // math.js ile güvenli bir şekilde hesaplama
+      return evaluate(expression);  // evaluate fonksiyonu ile hesaplama yapıyoruz
     } catch (error) {
       return 'Error';
     }
@@ -22,22 +16,22 @@ const KawaiiCalculator = () => {
 
   const handleButtonClick = (value) => {
     if (value === '=') {
-      // İşlem yapılacak ifade varsa sonucu hesapla
       if (input.trim() === '') {
         setResult('Error');
       } else {
-        setResult(calculateResult(input));
-        setInput(''); // Sonuç gösterildikten sonra input'u sıfırla
+        const calculatedResult = calculateResult(input);
+        setResult(calculatedResult);
+        setInput('');
       }
     } else if (value === 'C') {
-      setInput(''); // input'u sıfırla
-      setResult(0); // Sonucu sıfırla
+      setInput('');
+      setResult(0);
     } else {
-      // Eğer daha önce bir işlem yapıldıysa, yeni işlem bu sonuca eklenmeli
+      // Eğer işlem yapıldıysa, input kısmına mevcut sonucu ekleyelim
       if (input === '') {
-        setInput(result + value); // Sonuç varsa, input kısmında o sonucu kullan
+        setInput(result + value); // Eğer input boşsa, mevcut sonucu ekle
       } else {
-        setInput((prevInput) => prevInput + value); // Aksi halde input kısmına ekleme yap
+        setInput((prevInput) => prevInput + value); // Aksi halde input'a yeni değeri ekle
       }
     }
   };
